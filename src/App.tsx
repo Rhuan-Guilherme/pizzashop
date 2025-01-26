@@ -1,7 +1,8 @@
+import { Button } from "./components/ui/button"
 
 
 function App() {
-  return <h1>Prokect</h1>
+  return <Button>Cadastrar</Button>
 }
 
 export default App
