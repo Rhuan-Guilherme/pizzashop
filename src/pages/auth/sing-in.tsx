@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
 import { Helmet } from 'react-helmet-async'
 import { useForm } from 'react-hook-form'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import z from 'zod'
 
@@ -18,12 +18,17 @@ const singInForm = z.object({
 type SingInForm = z.infer<typeof singInForm>
 
 export function SingIn() {
+  const [searchParamas] = useSearchParams()
+
   const {
     register,
     handleSubmit,
     formState: { isSubmitting, errors },
   } = useForm<SingInForm>({
     resolver: zodResolver(singInForm),
+    defaultValues: {
+      email: searchParamas.get('email') ?? '',
+    },
   })
 
   const { mutateAsync: authenticate } = useMutation({
