@@ -13,8 +13,9 @@ function App() {
       <ThemeProvider storageKey="@pizzashop/theme" defaultTheme="dark">
         <Toaster richColors />
         <Helmet titleTemplate="%s | Pizza Shop" />
-        <QueryClientProvider client={queryClient} />
-        <RouterProvider router={router} />
+        <QueryClientProvider client={queryClient}>
+          <RouterProvider router={router} />
+        </QueryClientProvider>
       </ThemeProvider>
     </HelmetProvider>
   )
