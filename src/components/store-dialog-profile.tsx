@@ -1,9 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { getRestaurantApi } from '@/api/get-restaurant'
+import { updateProfile } from '@/api/update-profile'
 
 import { Button } from './ui/button'
 import {
@@ -38,6 +40,16 @@ export function StoreDialogProfile() {
     },
   })
 
+  async function handleUpdateProfile(data: StoreProfilType) {
+    try {
+      await updateProfile({ description: data.description, name: data.name })
+      toast.success('Perfil atualizado com sucesso!')
+    } catch (error) {
+      console.log(error)
+      toast.error('Ocorreu um erro ao atualizar o seu perfil. Tente novamente!')
+    }
+  }
+
   return (
     <DialogContent>
       <DialogHeader>
@@ -48,7 +60,7 @@ export function StoreDialogProfile() {
         </DialogDescription>
       </DialogHeader>
 
-      <form>
+      <form onSubmit={handleSubmit(handleUpdateProfile)}>
         <div className="space-y-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label className="text-right" htmlFor="name">
