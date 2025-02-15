@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { DialogClose } from '@radix-ui/react-dialog'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -21,7 +22,7 @@ import { Textarea } from './ui/textarea'
 
 const storeProfileSchema = z.object({
   name: z.string().min(1),
-  description: z.string(),
+  description: z.string().nullable(),
 })
 
 type StoreProfilType = z.infer<typeof storeProfileSchema>
@@ -43,24 +44,43 @@ export function StoreDialogProfile() {
     },
   })
 
+  function updateManagerRestaurantCache({
+    description,
+    name,
+  }: StoreProfilType) {
+    const cached = queryClient.getQueryData<GetRestaurantBody>(['restaurant'])
+
+    if (cached) {
+      queryClient.setQueryData<GetRestaurantBody>(['restaurant'], {
+        ...cached,
+        name,
+        description,
+      })
+    }
+
+    return { cached }
+  }
+
   const { mutateAsync: updateProfileFn } = useMutation({
     mutationFn: updateProfile,
-    onSuccess(_, { name, description }) {
-      const cached = queryClient.getQueryData<GetRestaurantBody>(['restaurant'])
+    onMutate({ name, description }) {
+      const { cached } = updateManagerRestaurantCache({ name, description })
 
-      if (cached) {
-        queryClient.setQueryData<GetRestaurantBody>(['restaurant'], {
-          ...cached,
-          name,
-          description,
-        })
+      return { previousProfile: cached }
+    },
+    onError(_, __, context) {
+      if (context?.previousProfile) {
+        updateManagerRestaurantCache(context.previousProfile)
       }
     },
   })
 
   async function handleUpdateProfile(data: StoreProfilType) {
     try {
-      await updateProfileFn({ description: data.description, name: data.name })
+      await updateProfileFn({
+        name: data.name,
+        description: data.description ?? '',
+      })
       toast.success('Perfil atualizado com sucesso!')
     } catch (error) {
       console.log(error)
@@ -99,9 +119,11 @@ export function StoreDialogProfile() {
         </div>
 
         <DialogFooter>
-          <Button variant="ghost" type="button">
-            Cancelar
-          </Button>
+          <DialogClose asChild>
+            <Button variant="ghost" type="button">
+              Cancelar
+            </Button>
+          </DialogClose>
           <Button type="submit" variant="success">
             Salvar
           </Button>
