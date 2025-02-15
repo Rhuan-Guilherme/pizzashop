@@ -1,10 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-import { getRestaurantApi } from '@/api/get-restaurant'
+import { getRestaurantApi, GetRestaurantBody } from '@/api/get-restaurant'
 import { updateProfile } from '@/api/update-profile'
 
 import { Button } from './ui/button'
@@ -27,9 +27,12 @@ const storeProfileSchema = z.object({
 type StoreProfilType = z.infer<typeof storeProfileSchema>
 
 export function StoreDialogProfile() {
+  const queryClient = useQueryClient()
+
   const { data: restaurant } = useQuery({
     queryKey: ['restaurant'],
     queryFn: getRestaurantApi,
+    staleTime: Infinity,
   })
 
   const { register, handleSubmit } = useForm<StoreProfilType>({
@@ -40,9 +43,24 @@ export function StoreDialogProfile() {
     },
   })
 
+  const { mutateAsync: updateProfileFn } = useMutation({
+    mutationFn: updateProfile,
+    onSuccess(_, { name, description }) {
+      const cached = queryClient.getQueryData<GetRestaurantBody>(['restaurant'])
+
+      if (cached) {
+        queryClient.setQueryData<GetRestaurantBody>(['restaurant'], {
+          ...cached,
+          name,
+          description,
+        })
+      }
+    },
+  })
+
   async function handleUpdateProfile(data: StoreProfilType) {
     try {
-      await updateProfile({ description: data.description, name: data.name })
+      await updateProfileFn({ description: data.description, name: data.name })
       toast.success('Perfil atualizado com sucesso!')
     } catch (error) {
       console.log(error)
