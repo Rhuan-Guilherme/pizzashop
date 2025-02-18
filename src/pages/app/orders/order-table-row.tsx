@@ -6,7 +6,17 @@ import { TableCell, TableRow } from '@/components/ui/table'
 
 import { OrderDetails } from './order-details'
 
-export function OrderTableRow() {
+interface OrderProps {
+  order: {
+    orderId: string
+    createdAt: Date | null
+    status: 'pending' | 'canceled' | 'processing' | 'delivering' | 'delivered'
+    customerName: string
+    total: number
+  }
+}
+
+export function OrderTableRow({ order }: OrderProps) {
   return (
     <TableRow>
       <TableCell>
@@ -22,7 +32,7 @@ export function OrderTableRow() {
         </Dialog>
       </TableCell>
       <TableCell className="font-mono text-sm font-medium">
-        123j1ij231mk3
+        {order && order.orderId}
       </TableCell>
       <TableCell className="text-muted-foreground">Há 15 minutos</TableCell>
       <TableCell>
@@ -31,8 +41,16 @@ export function OrderTableRow() {
           <span className="font-medium text-muted-foreground">Pendente</span>
         </div>
       </TableCell>
-      <TableCell className="font-medium">Rhuan Guilherme</TableCell>
-      <TableCell className="font-medium">R$ 149,90</TableCell>
+      <TableCell className="font-medium">
+        {order && order.customerName}
+      </TableCell>
+      <TableCell className="font-medium">
+        {order &&
+          order.total.toLocaleString('pt-br', {
+            style: 'currency',
+            currency: 'BRL',
+          })}
+      </TableCell>
       <TableCell>
         <Button variant="outline" size="xs">
           <ArrowRight className="mr-2 h-3 w-3" />
