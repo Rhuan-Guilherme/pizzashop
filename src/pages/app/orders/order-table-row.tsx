@@ -1,3 +1,5 @@
+import { formatDistanceToNow } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 import { ArrowRight, Search, X } from 'lucide-react'
 
 import { OrderStatus } from '@/components/order-status'
@@ -10,7 +12,7 @@ import { OrderDetails } from './order-details'
 interface OrderProps {
   order: {
     orderId: string
-    createdAt: Date | null
+    createdAt: string
     status: 'pending' | 'canceled' | 'processing' | 'delivering' | 'delivered'
     customerName: string
     total: number
@@ -35,7 +37,12 @@ export function OrderTableRow({ order }: OrderProps) {
       <TableCell className="font-mono text-sm font-medium">
         {order && order.orderId}
       </TableCell>
-      <TableCell className="text-muted-foreground">Há 15 minutos</TableCell>
+      <TableCell className="text-muted-foreground">
+        {formatDistanceToNow(order.createdAt, {
+          locale: ptBR,
+          addSuffix: true,
+        })}
+      </TableCell>
       <TableCell>{order && <OrderStatus status={order.status} />}</TableCell>
       <TableCell className="font-medium">
         {order && order.customerName}
