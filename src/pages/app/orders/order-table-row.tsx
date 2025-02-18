@@ -1,5 +1,6 @@
 import { ArrowRight, Search, X } from 'lucide-react'
 
+import { OrderStatus } from '@/components/order-status'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import { TableCell, TableRow } from '@/components/ui/table'
@@ -35,12 +36,7 @@ export function OrderTableRow({ order }: OrderProps) {
         {order && order.orderId}
       </TableCell>
       <TableCell className="text-muted-foreground">Há 15 minutos</TableCell>
-      <TableCell>
-        <div className="flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-slate-400"></span>
-          <span className="font-medium text-muted-foreground">Pendente</span>
-        </div>
-      </TableCell>
+      <TableCell>{order && <OrderStatus status={order.status} />}</TableCell>
       <TableCell className="font-medium">
         {order && order.customerName}
       </TableCell>
