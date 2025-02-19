@@ -28,7 +28,6 @@ export async function getOrders({
   orderId,
   status,
 }: GetOrdersQuery) {
-  console.log(pageIndex, customerName, orderId, status)
   const response = await api.get<GetOrdersResponse>('/orders', {
     params: {
       pageIndex,
