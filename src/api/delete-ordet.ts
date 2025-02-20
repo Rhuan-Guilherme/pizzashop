@@ -1,9 +1,9 @@
 import { api } from '@/lib/axios'
 
-interface DeleteUserParams {
+interface DeleteOrderRequest {
   orderId: string
 }
 
-export async function deleteOrder({ orderId }: DeleteUserParams) {
+export async function deleteOrder({ orderId }: DeleteOrderRequest) {
   await api.patch(`/orders/${orderId}/cancel`)
 }
